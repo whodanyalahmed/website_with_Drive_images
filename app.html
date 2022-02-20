@@ -299,184 +299,228 @@
         </div>
       </div>
     </footer>
-    <!--**************END FOOTER AREA**************-->
+  </body>
+  <!--**************END FOOTER AREA**************-->
 
-    <!--Add buttons to initiate auth sequence and sign out-->
-    <button id="authorize_button" style="display: none">Authorize</button>
-    <button id="signout_button" style="display: none">Sign Out</button>
+  <!--Add buttons to initiate auth sequence and sign out-->
+  <button id="authorize_button" style="display: none">Authorize</button>
+  <button id="signout_button" style="display: none">Sign Out</button>
 
-    <pre id="content" style="white-space: pre-wrap"></pre>
+  <pre id="content" style="white-space: pre-wrap"></pre>
 
-    <script type="text/javascript">
-      // Client ID and API key from the Developer Console
-      var CLIENT_ID =
-        "865545624424-8ifs0efkpsf6kkdjhrbb4hkrhuii0rj5.apps.googleusercontent.com";
-      var API_KEY = "AIzaSyCASW2xv550CqmJUrogiCnzKaQc153coX0";
+  <script type="text/javascript">
+    var list = [];
+    // Client ID and API key from the Developer Console
+    var CLIENT_ID =
+      "865545624424-8ifs0efkpsf6kkdjhrbb4hkrhuii0rj5.apps.googleusercontent.com";
+    var API_KEY = "AIzaSyCASW2xv550CqmJUrogiCnzKaQc153coX0";
 
-      // Array of API discovery doc URLs for APIs used by the quickstart
-      var DISCOVERY_DOCS = [
-        "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest",
-      ];
+    // Array of API discovery doc URLs for APIs used by the quickstart
+    var DISCOVERY_DOCS = [
+      "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest",
+    ];
 
-      // Authorization scopes required by the API; multiple scopes can be
-      // included, separated by spaces.
-      var SCOPES = "https://www.googleapis.com/auth/drive.metadata.readonly";
+    // Authorization scopes required by the API; multiple scopes can be
+    // included, separated by spaces.
+    var SCOPES = "https://www.googleapis.com/auth/drive.metadata.readonly";
 
-      var authorizeButton = document.getElementById("authorize_button");
-      var signoutButton = document.getElementById("signout_button");
+    var authorizeButton = document.getElementById("authorize_button");
+    var signoutButton = document.getElementById("signout_button");
 
-      /**
-       *  On load, called to load the auth2 library and API client library.
-       */
-      function handleClientLoad() {
-        gapi.load("client:auth2", initClient);
+    /**
+     *  On load, called to load the auth2 library and API client library.
+     */
+    function handleClientLoad() {
+      gapi.load("client:auth2", initClient);
+    }
+
+    /**
+     *  Initializes the API client library and sets up sign-in state
+     *  listeners.
+     */
+    function addListData(name) {
+      list.push(name);
+    }
+    function getListData() {
+      return list;
+    }
+    function initClient() {
+      gapi.client
+        .init({
+          apiKey: API_KEY,
+          clientId: CLIENT_ID,
+          discoveryDocs: DISCOVERY_DOCS,
+          scope: SCOPES,
+        })
+        .then(
+          function () {
+            // Listen for sign-in state changes.
+            gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
+
+            // Handle the initial sign-in state.
+            updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
+            authorizeButton.onclick = handleAuthClick;
+            signoutButton.onclick = handleSignoutClick;
+          },
+          function (error) {
+            appendPre(JSON.stringify(error, null, 2));
+          }
+        );
+    }
+
+    /**
+     *  Called when the signed in status changes, to update the UI
+     *  appropriately. After a sign-in, the API is called.
+     */
+    function updateSigninStatus(isSignedIn) {
+      if (isSignedIn) {
+        authorizeButton.style.display = "none";
+        signoutButton.style.display = "block";
+        listFiles();
+      } else {
+        authorizeButton.style.display = "block";
+        signoutButton.style.display = "none";
       }
+    }
 
-      /**
-       *  Initializes the API client library and sets up sign-in state
-       *  listeners.
-       */
-      function initClient() {
-        gapi.client
-          .init({
-            apiKey: API_KEY,
-            clientId: CLIENT_ID,
-            discoveryDocs: DISCOVERY_DOCS,
-            scope: SCOPES,
-          })
-          .then(
-            function () {
-              // Listen for sign-in state changes.
-              gapi.auth2
-                .getAuthInstance()
-                .isSignedIn.listen(updateSigninStatus);
+    /**
+     *  Sign in the user upon button click.
+     */
+    function handleAuthClick(event) {
+      gapi.auth2.getAuthInstance().signIn();
+    }
 
-              // Handle the initial sign-in state.
-              updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
-              authorizeButton.onclick = handleAuthClick;
-              signoutButton.onclick = handleSignoutClick;
-            },
-            function (error) {
-              appendPre(JSON.stringify(error, null, 2));
-            }
-          );
-      }
+    /**
+     *  Sign out the user upon button click.
+     */
+    function handleSignoutClick(event) {
+      gapi.auth2.getAuthInstance().signOut();
+    }
 
-      /**
-       *  Called when the signed in status changes, to update the UI
-       *  appropriately. After a sign-in, the API is called.
-       */
-      function updateSigninStatus(isSignedIn) {
-        if (isSignedIn) {
-          authorizeButton.style.display = "none";
-          signoutButton.style.display = "block";
-          listFiles();
-        } else {
-          authorizeButton.style.display = "block";
-          signoutButton.style.display = "none";
-        }
-      }
+    /**
+     * Append a pre element to the body containing the given message
+     * as its text node. Used to display the results of the API call.
+     *
+     * @param {string} message Text to be placed in pre element.
+     */
+    function appendPre(message) {
+      var pre = document.getElementById("content");
+      var textContent = document.createTextNode(message + "\n");
+      pre.appendChild(textContent);
+    }
 
-      /**
-       *  Sign in the user upon button click.
-       */
-      function handleAuthClick(event) {
-        gapi.auth2.getAuthInstance().signIn();
-      }
-
-      /**
-       *  Sign out the user upon button click.
-       */
-      function handleSignoutClick(event) {
-        gapi.auth2.getAuthInstance().signOut();
-      }
-
-      /**
-       * Append a pre element to the body containing the given message
-       * as its text node. Used to display the results of the API call.
-       *
-       * @param {string} message Text to be placed in pre element.
-       */
-      function appendPre(message) {
-        var pre = document.getElementById("content");
-        var textContent = document.createTextNode(message + "\n");
-        pre.appendChild(textContent);
-      }
-
-      /**
-       * Print files.
-       */
-      function ImageComponent(id) {
-        d =
-          `<div class="col-md-4">
+    /**
+     * Print files.
+     */
+    function ImageComponent(id) {
+      d =
+        `<div class="col-md-4">
             <a href="#">
             <div class="photo-item">
                 <img
                 src="https://drive.google.com/uc?export=view&id="` +
-          id +
-          `"
+        id +
+        `"
                 alt="whatever"
                 />
                 <p>Lorem ipsum dolor sit amet</p>
             </div>
             </a>
         </div>`;
-        return d;
-      }
+      return d;
+    }
 
-      folderId = "1ZtT-VQoj0V-4YqT7hUcFZioalqbzjdEv";
-      list = [];
+    folderId = "1ZtT-VQoj0V-4YqT7hUcFZioalqbzjdEv";
 
-      function listFiles() {
-        gapi.client.drive.files
-          .list({
-            // only search for images
-            q: "'1ZtT-VQoj0V-4YqT7hUcFZioalqbzjdEv' in parents and mimeType contains 'image' and trashed=false",
-            pageSize: 1000,
-            fields: "nextPageToken, files(id, name)",
-          })
-          .then(function (response) {
-            appendPre("Files:");
-            var files = response.result.files;
-            if (files && files.length > 0) {
-              for (var i = 0; i < files.length; i++) {
-                var file = files[i];
-                appendPre(file.name + " (" + file.id + ")");
-                // add ImageComponent in span of ImagesData
-                list.push(file.id);
-              }
-            } else {
-              appendPre("No files found.");
+    function listFiles() {
+      gapi.client.drive.files
+        .list({
+          // only search for images
+          q: "'1ZtT-VQoj0V-4YqT7hUcFZioalqbzjdEv' in parents and mimeType contains 'image' and trashed=false",
+          pageSize: 1000,
+          fields: "nextPageToken, files(id, name)",
+        })
+        .then(function (response) {
+          appendPre("Files:");
+          var files = response.result.files;
+          if (files && files.length > 0) {
+            for (var i = 0; i < files.length; i++) {
+              var file = files[i];
+              appendPre(file.name + " (" + file.id + ")");
+              // add ImageComponent in span of ImagesData
+              addListData(ImageComponent(file.id));
+              // length of list
+
+              // list.push(file.id);
             }
-          });
+          } else {
+            appendPre("No files found.");
+          }
+        });
+    }
+    temp = getListData();
+    console.log(temp);
+    //   print length of list
+    //   if length is 0, then print no files found
+    // temp = getListData();
+
+    //   run loop on list
+    temp = setTimeout(() => {
+      temp = getListData();
+      console.log("setTimeout just runned");
+
+      if (temp.length == 0) {
+        appendPre("No files found in the folder");
+      } else {
+        console.log("temp.length is not 0");
+        for (var i = 0; i < temp.length; i++) {
+          // get image from drive
+          document.getElementById("ImagesData").innerHTML += temp[i];
+          console.log(temp[i]);
+        }
       }
-      console.log(list);
-      //   run loop on list
-      list.forEach((element) => {
-        console.log(element);
-        document.getElementById("ImagesData").innerHTML +=
-          ImageComponent(element);
-      });
-    </script>
+      // print len of list
+      // print list
+      console.log(temp.length);
+    }, 10000);
+    console.log(temp);
+    let ele = `<div class="col-md-4">
+            <a href="#">
+              <div class="photo-item">
+                <img
+                  src="https://drive.google.com/uc?export=view&id=1HO2DhbwXfk3szvaZgbIm-vkHag5HnSNc"
+                  alt="whatever"
+                />
+                <p>Lorem ipsum dolor sit amet</p>
+              </div>
+            </a>
+          </div>`;
+    window.onload = function () {
+      alert(document.getElementById("ImagesData"));
+      let elem = document.getElementById("ImagesData");
+      console.log(elem);
+    };
+    // if length is 0
+  </script>
 
-    <script
-      async
-      defer
-      src="https://apis.google.com/js/api.js"
-      onload="this.onload=function(){};handleClientLoad()"
-      onreadystatechange="if (this.readyState === 'complete') this.onload()"
-    ></script>
+  <script
+    async
+    defer
+    src="https://apis.google.com/js/api.js"
+    onload="this.onload=function(){};handleClientLoad()"
+    onreadystatechange="if (this.readyState === 'complete') this.onload()"
+  ></script>
 
-    <!-- JS Files -->
-    <script
+  <!-- JS Files -->
+  <!-- <script
       data-cfasync="false"
       src="https://verticreative.com/cc/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"
-    ></script>
-    <script src="https://verticreative.com/cc/assets/js/jquery.min.js"></script>
-    <script src="https://verticreative.com/cc/assets/js/popper.min.js"></script>
-    <script src="https://verticreative.com/cc/assets/js/bootstrap.min.js"></script>
-    <script src="https://verticreative.com/cc/assets/js/owl.carousel.min.js"></script>
-    <script src="https://verticreative.com/cc/assets/js/bootstrap5.min.js"></script>
-    <script src="https://verticreative.com/cc/assets/js/scripts.js"></script>
-  </body>
+    ></script> -->
+  <script src="https://verticreative.com/cc/assets/js/jquery.min.js"></script>
+  <!-- <script src="https://verticreative.com/cc/assets/js/popper.min.js"></script>
+  <script src="https://verticreative.com/cc/assets/js/bootstrap.min.js"></script>
+  <script src="https://verticreative.com/cc/assets/js/owl.carousel.min.js"></script>
+  <script src="https://verticreative.com/cc/assets/js/bootstrap5.min.js"></script>
+  <script src="https://verticreative.com/cc/assets/js/scripts.js"></script>
+  -->
 </html>
