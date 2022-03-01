@@ -33,7 +33,8 @@ class App extends Component {
           this.setState({
             googleAuth: window.gapi.auth2.getAuthInstance(),
           });
-          this.state.googleAuth.isSignedIn.listen(this.updateSigninStatus);
+
+          this.state.googleAuth.isSignedIn.listen(this.updateSigninStatus());
           authorizeButton.addEventListener("click", this.signInFunction);
           signoutButton.addEventListener("click", this.signOutFunction);
         });
@@ -65,22 +66,21 @@ class App extends Component {
         fields: "nextPageToken, files(id, name)",
       })
       .then(function (response) {
-        this.appendPre("Files:");
+        // this.appendPre("Files:");
         var files = response.result.files;
         if (files && files.length > 0) {
           for (var i = 0; i < files.length; i++) {
             var file = files[i];
-            this.appendPre(file.name + " (" + file.id + ")");
+            // this.appendPre(file.name + " (" + file.id + ")");
             // add ImageComponent in span of ImagesData
             // length of list
 
             // list.push(file.id);
           }
-        } else {
-          this.appendPre("No files found.");
         }
       });
   };
+
   updateSigninStatus = (isSignedIn) => {
     this.setSigninStatus();
     if (isSignedIn) {
@@ -116,7 +116,7 @@ class App extends Component {
         </div>
         <button id="signin-btn">Sign In</button>
         <button id="signout-btn">Sign Out</button>
-        <pre id="content" style="white-space: pre-wrap"></pre>
+        {/* <span id="content" style="white-space: pre-wrap"></span> */}
       </div>
     );
   }

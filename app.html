@@ -418,7 +418,7 @@
             <a href="#">
             <div class="photo-item">
                 <img
-                src="https://drive.google.com/uc?export=view&id="` +
+                src="https://drive.google.com/uc?export=view&id=` +
         id +
         `"
                 alt="whatever"
@@ -426,7 +426,8 @@
                 <p>Lorem ipsum dolor sit amet</p>
             </div>
             </a>
-        </div>`;
+        </div>
+          `;
       return d;
     }
 
@@ -448,7 +449,10 @@
               var file = files[i];
               appendPre(file.name + " (" + file.id + ")");
               // add ImageComponent in span of ImagesData
-              addListData(ImageComponent(file.id));
+              document.getElementById("imagesData").innerHTML += ImageComponent(
+                file.id
+              );
+
               // length of list
 
               // list.push(file.id);
@@ -458,48 +462,7 @@
           }
         });
     }
-    temp = getListData();
-    console.log(temp);
-    //   print length of list
-    //   if length is 0, then print no files found
-    // temp = getListData();
 
-    //   run loop on list
-    temp = setTimeout(() => {
-      temp = getListData();
-      console.log("setTimeout just runned");
-
-      if (temp.length == 0) {
-        appendPre("No files found in the folder");
-      } else {
-        console.log("temp.length is not 0");
-        for (var i = 0; i < temp.length; i++) {
-          // get image from drive
-          document.getElementById("ImagesData").innerHTML += temp[i];
-          console.log(temp[i]);
-        }
-      }
-      // print len of list
-      // print list
-      console.log(temp.length);
-    }, 10000);
-    console.log(temp);
-    let ele = `<div class="col-md-4">
-            <a href="#">
-              <div class="photo-item">
-                <img
-                  src="https://drive.google.com/uc?export=view&id=1HO2DhbwXfk3szvaZgbIm-vkHag5HnSNc"
-                  alt="whatever"
-                />
-                <p>Lorem ipsum dolor sit amet</p>
-              </div>
-            </a>
-          </div>`;
-    window.onload = function () {
-      alert(document.getElementById("ImagesData"));
-      let elem = document.getElementById("ImagesData");
-      console.log(elem);
-    };
     // if length is 0
   </script>
 
@@ -516,7 +479,7 @@
       data-cfasync="false"
       src="https://verticreative.com/cc/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"
     ></script> -->
-  <script src="https://verticreative.com/cc/assets/js/jquery.min.js"></script>
+  <!-- <script src="https://verticreative.com/cc/assets/js/jquery.min.js"></script> -->
   <!-- <script src="https://verticreative.com/cc/assets/js/popper.min.js"></script>
   <script src="https://verticreative.com/cc/assets/js/bootstrap.min.js"></script>
   <script src="https://verticreative.com/cc/assets/js/owl.carousel.min.js"></script>
