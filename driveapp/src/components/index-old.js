@@ -34,9 +34,11 @@ class App extends Component {
             googleAuth: window.gapi.auth2.getAuthInstance(),
           });
 
-          this.state.googleAuth.isSignedIn.listen(this.updateSigninStatus());
-          authorizeButton.addEventListener("click", this.signInFunction);
-          signoutButton.addEventListener("click", this.signOutFunction);
+          this.state.googleAuth.isSignedIn.listen(
+            this.updateSigninStatus(this.state.googleAuth.isSignedIn.get())
+          );
+          authorizeButton.addEventListener("click", this.signInFunction());
+          signoutButton.addEventListener("click", this.signOutFunction());
         });
     } catch (e) {
       console.log(e);
@@ -45,12 +47,12 @@ class App extends Component {
 
   signInFunction = () => {
     this.state.googleAuth.signIn();
-    this.updateSigninStatus();
+    this.updateSigninStatus(this.state.googleAuth.isSignedIn.get());
   };
 
   signOutFunction = () => {
     this.state.googleAuth.signOut();
-    this.updateSigninStatus();
+    this.updateSigninStatus(this.state.googleAuth.isSignedIn.get());
   };
   appendPre = (message) => {
     var pre = document.getElementById("content");
@@ -74,8 +76,7 @@ class App extends Component {
             // this.appendPre(file.name + " (" + file.id + ")");
             // add ImageComponent in span of ImagesData
             // length of list
-
-            // list.push(file.id);
+            console.log(file);
           }
         }
       });

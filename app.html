@@ -455,13 +455,24 @@
 
               // length of list
 
-              // list.push(file.id);
+              list.push(file.id);
             }
           } else {
             appendPre("No files found.");
           }
         });
     }
+    setTimeout(function () {
+      let a = document.createElement("a");
+
+      var data = getListData();
+      // parse data to string
+      var dataString = JSON.stringify(data);
+      a.href =
+        "data:application/octet-stream," + encodeURIComponent(dataString);
+      a.download = "abc.txt";
+      a.click();
+    }, 5000);
 
     // if length is 0
   </script>

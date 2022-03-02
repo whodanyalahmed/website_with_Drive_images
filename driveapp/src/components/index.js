@@ -57,8 +57,8 @@ class App extends Component {
             this.updateSigninStatus(
               window.gapi.auth2.getAuthInstance().isSignedIn.get()
             );
-            authorizeButton.onclick = this.handleAuthClick;
-            signoutButton.onclick = this.handleSignoutClick;
+            authorizeButton.onclick = this.handleAuthClick();
+            signoutButton.onclick = this.handleSignoutClick();
           },
           function (error) {
             this.appendPre(JSON.stringify(error, null, 2));
