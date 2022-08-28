@@ -34,7 +34,7 @@ def getFiles(service, logger):
         return items
 
 
-def main():
+def main(logger):
     """Shows basic usage of the Drive v3 API.
     Prints the names and ids of the first 10 files the user has access to.
     """
@@ -71,12 +71,16 @@ def main():
     #   q: "'1ZtT-VQoj0V-4YqT7hUcFZioalqbzjdEv' in parents and mimeType contains 'image' and trashed=false",
 
 
-if __name__ == '__main__':
+def final(logger):
     while True:
 
-        logger = open('log.txt', 'a+')
         # write initial time in log file started at
         logger.write('started at: ' + str(datetime.datetime.now())+"\n")
-        main()
-        logger.close()
+        main(logger)
         time.sleep(60)
+
+
+if __name__ == '__main__':
+
+    logger = open('log.txt', 'a+')
+    final(logger)
